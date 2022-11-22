@@ -1,23 +1,24 @@
 package org.launchcode.techjobs.persistent.models;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class Job{
+public class Job extends AbstractEntity{
 
-    @Id
-    @GeneratedValue
-    private int id;
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    private Employer employer;
 
-    private String name;
-
-    private String employer;
     private String skills;
+
+//    private final List<Employer> employers = new ArrayList<>(); // I was trying to create a many to many relationship using many to one annotation!
 
     public Job() {
     }
 
-    public Job(String anEmployer, String someSkills) {
+    public Job(Employer anEmployer, String someSkills) {
         super();
         this.employer = anEmployer;
         this.skills = someSkills;
@@ -25,19 +26,12 @@ public class Job{
 
     // Getters and setters.
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmployer() {
+    public Employer getEmployer() {
         return employer;
     }
 
-    public void setEmployer(String employer) {
+    public void setEmployer(Employer employer) {
         this.employer = employer;
     }
 
