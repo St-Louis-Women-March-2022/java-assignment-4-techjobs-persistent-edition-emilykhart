@@ -1,6 +1,10 @@
 package org.launchcode.techjobs.persistent.models;
 
+import org.aspectj.lang.annotation.RequiredTypes;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +12,6 @@ import java.util.List;
 public class Job extends AbstractEntity{
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
     private Employer employer;
 
     @ManyToMany
@@ -19,9 +22,10 @@ public class Job extends AbstractEntity{
     public Job() {
     }
 
-    public Job(Employer employer, List<Skill> skills) {
-        this.employer = employer;
-        this.skills = skills;
+    public Job(Employer Employer, List<Skill> Skills) {
+        super();
+        this.employer = Employer;
+        this.skills = Skills;
     }
 
     // Getters and setters.

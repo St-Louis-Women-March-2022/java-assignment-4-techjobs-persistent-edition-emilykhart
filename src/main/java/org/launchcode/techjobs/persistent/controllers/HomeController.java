@@ -49,16 +49,25 @@ public class HomeController {
     }
 
     @PostMapping("add")
-    public String processAddJobForm(@ModelAttribute @Valid Job newJob,
-                                       Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
+    public String processAddJobForm(@ModelAttribute @Valid Job newJob, Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
         if (errors.hasErrors()) {
             model.addAttribute("title", "Add Job");
+            model.addAttribute("employers", employerRepository.findAll());
+            model.addAttribute("skills", skillRepository.findAll());
             return "add";
         }
-        model.addAttribute("employers", employerRepository.findById(employerId));
-        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
-        newJob.setSkills(skillObjs);
+        Optional<Employer> result = employerRepository.findById(employerId);
+        if (result.isEmpty()){
+            model.addAttribute("title", "Invalid Employer ID: " + employerId);
+            return "add";
+        } else {
+            Employer employer = result.get();
+            newJob.setEmployer(employer);
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+            newJob.setSkills(skillObjs);
+            jobRepository.save(newJob);
+        }
         return "redirect:";
     }
 
@@ -67,13 +76,13 @@ public class HomeController {
         Optional<Job> result = jobRepository.findById(jobId);
         if(result.isEmpty()) {
             model.addAttribute("title", "Invalid Job Id: " + jobId);
+            return "redirect:../";
         } else {
             Job job = result.get();
             model.addAttribute("job", job);
         }
         return "view";
     }
-
 
 
 }
