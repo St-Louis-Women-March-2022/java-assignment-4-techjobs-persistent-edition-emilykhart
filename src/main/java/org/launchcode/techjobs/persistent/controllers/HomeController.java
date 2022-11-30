@@ -52,30 +52,34 @@ public class HomeController {
     public String processAddJobForm(@ModelAttribute @Valid Job newJob,
                                     Errors errors, Model model, @RequestParam int employerId, @RequestParam List<Integer> skills) {
 
-        if (errors.hasErrors() || skills==null) {
+        if (errors.hasErrors() || skills == null) {
             model.addAttribute("title", "Add Job");
+            model.addAttribute("employers", employerRepository.findAll());
+            model.addAttribute("skills", skillRepository.findAll());
             return "add";
-        }
-        Optional<Employer> result = employerRepository.findById(employerId);
-        if (result.isEmpty()){
-            model.addAttribute("title", "Invalid Employer ID: " + employerId);
         } else {
-            Employer employer = result.get();
-            newJob.setEmployer(employer);
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+            model.addAttribute("skills", skillObjs);
+            newJob.setSkills(skillObjs);
+
+            Optional optionalEmployer = employerRepository.findById(employerId);
+            if (optionalEmployer.isPresent()) {
+                Employer employer = (Employer) optionalEmployer.get();
+                model.addAttribute("employers", employer);
+                newJob.setEmployer(employer);
+            }
+            jobRepository.save(newJob);
+            model.addAttribute("job", newJob);
+
+            return "redirect:";
         }
-
-        List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
-        newJob.setSkills(skillObjs);
-
-        jobRepository.save(newJob);
-        return "redirect:";
     }
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
         Optional<Job> result = jobRepository.findById(jobId);
         if(result.isEmpty()) {
-            model.addAttribute("title", "Invalid Job Id: " + jobId);
+            model.addAttribute("title", "Invalid Id: " + jobId);
         } else {
             Job job = result.get();
             model.addAttribute("job", job);
